@@ -2,7 +2,7 @@
 
 # ⚡ Net Speed Meter
 
-**ودجت خفيف لسرعة الإنترنت، يعيش فوق شريط المهام وكأنه جزء منه**
+**A featherweight internet speed widget that lives on your taskbar like it belongs there**
 
 [![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white)](#)
 [![Language](https://img.shields.io/badge/C%23-.NET_Framework-239120?logo=csharp&logoColor=white)](#)
@@ -11,202 +11,202 @@
 [![Dependencies](https://img.shields.io/badge/dependencies-zero-success)](#)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-### [⬇️ تحميل آخر إصدار](https://github.com/Moussab200/net-speed-meter/releases/latest)
+### [⬇️ Download the latest release](https://github.com/Moussab200/net-speed-meter/releases/latest)
 
 </div>
 
 ---
 
-ودجت صغير بيعرض سرعة الإنترنت اللحظية فوق الشاشة، وبيسجّل الاستهلاك التراكمي، وفيه اختبار سرعة مدمج.
+A tiny widget that shows your live internet speed on screen, tracks cumulative data usage, and includes a built-in speed test.
 
-**ليش هاد البرنامج مختلف:**
+**Why this one's different:**
 
-- 🪶 **~80 كيلوبايت، ~30 ميجا رام** — بلا Electron، بلا أي إطار عمل، بلا ولا اعتمادية خارجية وحدة
-- 🎨 **بياخد لون وحجم شريط المهام تلقائياً** — بيبين وكأنه جزء أصلي منه، مش أداة عايمة فوقه
-- 🔒 **مبني بالأمان كأساس، مش إضافة لاحقة** — نسخة محمية بـ`Program Files`، موقّعة رقمياً، ومحصّنة ضد استبدال الملف (كل التفاصيل بالأسفل)
-- ✅ **43 اختبار آلي + بوابة جودة** — تشتغل على الكود الحقيقي نفسه، مش نسخة منفصلة
-- 🌙 **بلا أي اتصال إنترنت خفي** — الاتصال الوحيد بيصير لما تضغط أنت زر اختبار السرعة بنفسك
+- 🪶 **~80KB, ~30MB RAM** — no Electron, no framework, zero external dependencies
+- 🎨 **Automatically matches your taskbar's color and height** — reads like a native part of it, not a floating overlay
+- 🔒 **Built with security as a foundation, not an afterthought** — the running copy lives in a protected `Program Files` folder, is digitally signed, and is hardened against file tampering (full details below)
+- ✅ **43 automated tests + a quality gate** — run against the real app code, not a copy of it
+- 🌙 **No hidden network calls** — the only connection it ever makes is the one you trigger yourself with the speed test button
 
-برنامج محلي بالكامل — **ما بيرفع ولا بيرسل أي بيانات لأي جهة**.
-
----
-
-## التشغيل
-
-النسخة اللي بتشتغل موجودة بـ `C:\Program Files\Net Speed Meter\`، وفي اختصار على سطح المكتب وبقائمة ابدأ. دبل كليك وبس — ما في نافذة إعدادات بتطلع بالبداية، الودجت بيظهر ويسكت.
-
-`D:\New\net-speed-meter\` هو مجلد **التطوير** (المصدر والبناء)، مش المكان اللي بيشتغل منه البرنامج.
-
-**كل الإعدادات بالكلك اليمين على الودجت.**
-
-في كمان أيقونة بالتراي (ضمن `hidden icons` جنب الساعة) — منها تقدر تخفي الودجت أو تطفي البرنامج، وبتعرض تلميح فيه السرعة الحالية والاستهلاك اليومي لما تحط الماوس فوقها.
+Fully local — **it never uploads or transmits anything.**
 
 ---
 
-## الأمان
+## Running it
 
-البرنامج بحد ذاته سطح هجومه صغير جداً: ما بيفتح منفذ استماع، ما بيقبل اتصالات واردة، ما بيشغّل أي أمر أو برنامج تاني، ما بيحمّل أي مكتبة خارجية، وما بياخد صلاحيات أدمن. الاتصال الوحيد بالإنترنت بيصير لما تضغط أنت زر اختبار السرعة.
+The live copy lives in `C:\Program Files\Net Speed Meter\`, with shortcuts on the Desktop and in the Start Menu. Double-click and that's it — no setup dialog on first launch, the widget just appears and gets out of your way.
 
-الخطر الواقعي مش "هاكر بيهاجم البرنامج" — هو **إن حدا يستبدل ملف الـ exe** بنسخة خبيثة، خصوصاً إنه مربوط بالتشغيل التلقائي مع ويندوز.
+`D:\New\net-speed-meter\` (this repo) is the **development** folder — source and build scripts, not where the app actually runs from.
 
-**الحماية مبنية على المنع مش الكشف:**
+**All settings live in the right-click menu on the widget itself.**
 
-| الإجراء | الفايدة |
+There's also a tray icon (under the hidden-icons chevron next to the clock) — use it to hide the widget or quit the app, and hover it for a tooltip with the current speed and today's usage.
+
+---
+
+## Security
+
+The app's own attack surface is tiny: no listening port, no inbound connections, no shelling out to other programs, no dynamically loaded libraries, and no admin rights required to run. The only network call it ever makes is the one you trigger by clicking the speed test button.
+
+The realistic risk isn't "someone hacks the running program" — it's **someone replacing the exe** with a malicious one, especially since it's wired into Windows autostart.
+
+**The defense is prevention, not detection:**
+
+| Measure | Why it helps |
 |---|---|
-| النسخة الشغالة بـ `Program Files` | الكتابة عليه بدها أدمن — مالوير بحسابك العادي **ما بيقدر يستبدل الملف** |
-| اختصار على سطح المكتب بدل نسخة exe | ما بيضل نسخة قابلة للكتابة بمجلد مزامن مع OneDrive |
-| توقيع رقمي | بتقدر تتأكد بنفسك: كلك يمين ← Properties ← Digital Signatures |
-| تقوية مسار المكتبات | ما ينفع حدا يزرع DLL بمجلد البرنامج |
+| Live copy in `Program Files` | Writing there requires admin — malware running as your regular user **can't overwrite the file** |
+| Desktop shortcut instead of a second exe | No writable copy sitting in a folder synced by OneDrive |
+| Digital signature | Verify it yourself anytime: right-click → Properties → Digital Signatures |
+| Hardened DLL search path | Nothing can plant a malicious DLL in the app's folder and have it picked up |
 
-**فحص السلامة بأي وقت:**
+**Check integrity anytime:**
 
 ```
 powershell -ExecutionPolicy Bypass -File verify.ps1
 ```
 
-بيفحص التوقيع والبصمة وصلاحيات المجلد ومسارات التشغيل. **متعمّد إنه سكربت خارجي مش فحص جوّا البرنامج** — الفحص الذاتي بيشتغل جوّا نفس الكود اللي عم نفحصه، فما بيصمد قدام مهاجم مقصود، وكمان بيبطّئ البرنامج بلا داعي.
+Checks the signature, the file hash, folder permissions, and every autostart/shortcut path. **Deliberately a separate script, not a self-check inside the app** — a self-check runs inside the same code it's auditing, so it can't be trusted against a deliberate attacker, and it would only add runtime overhead for no real benefit.
 
-**تنزيل نسخة جديدة بعد أي تعديل** (بيطلب أدمن مرة وحدة):
+**Publish a new build after any change** (asks for admin once):
 
 ```
 powershell -ExecutionPolicy Bypass -File deploy.ps1
 ```
 
-بيبني، بيوقّع، بينزّل بالمجلد المحمي، وبيحدّث كل الاختصارات.
+Builds, signs, installs into the protected folder, and updates every shortcut.
 
-### ليش ما في تحديث تلقائي
+### Why there's no auto-update
 
-مقصود. التحديث التلقائي بيبدو ميزة أمان وهو بالعكس — بيفتح قناة جاهزة يندفع منها كود على جهازك. البرنامج أأمن وأخف بدونه.
+Deliberate. Auto-update sounds like a security feature, but it's the opposite — it's a ready-made channel for pushing code onto your machine later. The app is safer and lighter without one.
 
-### مصيدة معروفة: برامج الحماية
+### A known trap: antivirus false positives
 
-Malwarebytes (وغيره) ممكن يحجر البرنامج رغم إنه نظيف. السبب إن تشكيلة صفاته تطابق أنماط الفحص السلوكي: exe غير موقّع من جهة معروفة + نافذة مخبّاة من شريط المهام + كتابة بمفتاح التشغيل التلقائي + تنزيل بيانات بصمت (اختبار السرعة) + ملف جديد ما حدا شافه قبل. كل صفة منها إجت من طلب صريح، بس مجتمعة بتبيّن مريبة لفحص آلي.
+Malwarebytes (and others) may quarantine this app even though it's clean. The combination of traits matches behavioral-detection patterns: an exe not signed by a well-known publisher + a window hidden from the taskbar + a Run-key autostart entry + a silent network download (the speed test) + a brand-new file nobody's seen before. Every one of those traits exists for a legitimate, explicit reason — but together they look suspicious to an automated scanner.
 
-الحل: استثناء لمجلد `C:\Program Files\Net Speed Meter` من برنامج الحماية.
+Fix: add an exclusion for `C:\Program Files\Net Speed Meter` in your antivirus.
 
-## منع تكرار الأخطاء
+## Preventing regressions
 
-كل صنف خطأ وقع فعلياً بهالمشروع صار عليه فحص آلي بيمنع رجوعه. **`deploy.ps1` بيرفض ينشر إذا أي فحص فشل.**
+Every category of bug that actually happened in this project now has an automated check that keeps it from coming back. **`deploy.ps1` refuses to publish if any check fails.**
 
 ```
 powershell -ExecutionPolicy Bypass -File check-all.ps1
 ```
 
-بيفحص:
+What it checks:
 
-| الفحص | الخطأ اللي بيمنعه |
+| Check | Bug it prevents |
 |---|---|
-| **التباين** (5832 لون خلفية) | «نص أبيض على خلفية بيضاء» — الودجت يختفي بالثيم الفاتح |
-| ترميز الملفات (BOM) | النص العربي بيتحوّل طلاسم وينكسر البناء |
-| البناء بلا تحذيرات | أخطاء صامتة |
-| صحة سكربتات PowerShell | سكربت مكسور بينكشف وقت التشغيل |
-| تنسيق الوحدات | تحويل KB/MB/GB أو بايت↔بِت غلط |
-| تدوير الاستهلاك | ضياع العدّادات عند تغيّر اليوم/الشهر |
-| فروقات العدّاد | رقم ضخم غلط لما كرت الشبكة يعيد التشغيل |
-| مفاتيح الإعدادات | إعداد بينحفظ وما بينقرا = بيضيع بصمت |
-| فحوصات أمنية | عنوان شبكة جديد، تشغيل برامج، تجاوز شهادات، بيانات مخبّاة |
+| **Contrast** (5,832 background colors) | "white text on a white background" — the widget disappearing under a light theme |
+| File encoding (BOM) | Non-ASCII text turning into garbage and breaking the build |
+| Warning-free build | Silent errors |
+| PowerShell script syntax | A broken script that only fails at runtime |
+| Unit formatting | Wrong KB/MB/GB or byte↔bit conversion |
+| Usage rollover | Counters lost when the day/month changes |
+| Counter deltas | A bogus huge number when the network adapter resets |
+| Settings round-trip | A setting that saves but never loads back = silently lost |
+| Security checks | New network endpoints, spawning processes, cert bypass, hidden data |
 
-اختبارات المنطق لحالها (43 اختبار، بتشتغل على **دوال البرنامج الحقيقية** مش نسخة منها):
+The logic tests on their own (43 checks, run against the **real app functions**, not a copy):
 
 ```
 run-tests.cmd
 ```
 
-## البناء من المصدر
+## Building from source
 
 ```
 build.cmd
 ```
 
-بيستعمل `csc.exe` المدمج بويندوز — **ما بدّو أي SDK ولا Node ولا Python ولا إنترنت**. الناتج ملف `NetSpeedMeter.exe` واحد بحدود 70KB.
+Uses the C# compiler that ships with Windows — **no SDK, no Node, no Python, no internet required**. Produces a single `NetSpeedMeter.exe`, around 80KB.
 
-لإعادة توليد الأيقونة (بعد ما تغيّر الألوان الافتراضية بالكود):
+To regenerate the icon (after changing the default colors in the code):
 
 ```
 powershell -ExecutionPolicy Bypass -File make-icon.ps1
 ```
 
-### ليش C# ومش Electron
+### Why C# instead of Electron
 
-البرنامج بيضل شغّال 24 ساعة، فالخفّة كانت شرط أساسي:
+This app runs 24/7, so being lightweight was a hard requirement:
 
 | | Electron | **C# + csc.exe** |
 |---|---|---|
-| حجم الملف | ~180MB | **~70KB** |
-| الرام | ~200MB | **~15MB** |
-| اعتماديات | Node + node_modules | **ولا وحدة** |
+| File size | ~180MB | **~80KB** |
+| RAM | ~200MB | **~30MB** |
+| Dependencies | Node + node_modules | **none** |
 
 ---
 
-## خيارات القائمة
+## Menu options
 
-### المكان
-- **اقفل المكان** — بيمنع سحبه بالغلط
-- **الالتصاق بحواف الشاشة** — بيلزق بالحواف لما تقرّبه منها (مفعّل افتراضياً)
-- **انقله لزاوية** — أعلى/أسفل، يمين/يسار
-- **انقله لشاشة** — بيظهر بس إذا عندك أكتر من شاشة
+### Position
+- **Lock position** — prevents accidental dragging
+- **Snap to screen edges** — snaps when you drag it close (on by default)
+- **Move to corner** — top/bottom, left/right
+- **Move to monitor** — shown only if you have more than one screen
 
-### المظهر
-- **دائماً بالمقدمة**
-- **الشفافية** — 50% / 70% / 85% / 100%
-- **حجم الخط** و**الاتجاه** (عمودي زي الصورة، أو أفقي)
-- **بنفس ارتفاع شريط المهام** — بيقيس شريطك وقت التشغيل وبيضبط حجم الخط تلقائياً ليطابقه (مفعّل افتراضياً)
-- **بنفس لون شريط المهام** — بياخد عيّنة من بكسلات الشريط نفسه، فبيطلع مطابق تماماً لِلّي شايفه، وبيتبع الثيم لما تبدّله (مفعّل افتراضياً)
-- **الألوان** — 5 أطقم جاهزة، أو خصّص كل لون على حدة (سهم الرفع، سهم التنزيل، الأرقام، الخلفية)
+### Appearance
+- **Always on top**
+- **Opacity** — 50% / 70% / 85% / 100%
+- **Font size** and **orientation** (vertical, as in the screenshot, or horizontal)
+- **Match taskbar height** — measures your taskbar at launch and auto-scales the font to fit (on by default)
+- **Match taskbar color** — samples the actual pixels of your taskbar, so it matches exactly what you see and follows your theme when you switch it (on by default)
+- **Colors** — 5 ready-made presets, or customize every color individually (up arrow, down arrow, numbers, background)
 
-### القياس
-- **الصيغة** — تلقائي (بيبدّل بين KB و MB و GB حسب السرعة) أو ثبّتها على وحدة وحدة
-- **الوحدة** — بايت `MBps` أو بِت `Mbps` (الفرق ×8)
-- **كرت الشبكة** — تلقائي (الأكثر حركة) أو اختر كرت محدّد
+### Measurement
+- **Format** — auto (switches between KB/MB/GB based on speed) or pin it to one unit
+- **Unit** — bytes `MBps` or bits `Mbps` (the difference is ×8)
+- **Network adapter** — auto (busiest one) or pick a specific one
 
-### اختبار سرعة الإنترنت
-بيقيس زمن الاستجابة والتنزيل والرفع عبر نقاط قياس Cloudflare، بعدة اتصالات متوازية (اتصال واحد بيعطي رقم أقل من الواقع على الخطوط السريعة). آخر نتيجة بتنحفظ وبتظهر بالقائمة.
+### Speed test
+Measures ping, download, and upload against Cloudflare's test endpoints, using several parallel connections (a single connection understates real throughput on fast lines). The last result is saved and shown in the menu.
 
-### الاستهلاك
-اليوم / هذا الشهر / الإجمالي، مع زر تصفير. بيتصفّر لحاله عند بداية كل يوم وكل شهر.
+### Usage
+Today / this month / all-time, with a reset button. Rolls over automatically at the start of each day and month.
 
-> **تنويه:** العدّاد بيقيس حركة كرت الشبكة، يعني بيشمل حركة الشبكة المحلية كمان مش بس الإنترنت — نفس سلوك Task Manager بالضبط.
+> **Note:** the counter measures traffic on the network adapter, which includes local network traffic too, not just internet — exactly like Task Manager.
 
-### السلوك
-- **تمرير النقر** — النقرات بتعدّي من خلال الودجت للنافذة يلي تحته
-- **إخفاء عند ملء الشاشة** — بيختفي لحاله بالألعاب والأفلام
-- **يبدأ مع ويندوز**
-- **أنشئ اختصار في قائمة ابدأ** — حتى بحث ويندوز يلاقي البرنامج
+### Behavior
+- **Click-through** — clicks pass through the widget to whatever's underneath
+- **Hide during fullscreen** — disappears on its own during games and movies
+- **Start with Windows**
+- **Create Start Menu shortcut** — so Windows Search can find the app
 
 ---
 
-## وين بتنحفظ البيانات
+## Where data is stored
 
-بمجلد `%APPDATA%\NetSpeedMeter\`:
+In `%APPDATA%\NetSpeedMeter\`:
 
-| الملف | المحتوى |
+| File | Contents |
 |---|---|
-| `settings.ini` | كل الإعدادات + المكان + آخر نتيجة اختبار |
-| `usage.ini` | عدّادات الاستهلاك |
-| `error.log` | بينكتب بس إذا صار خطأ (البرنامج ما بيطلّع نوافذ خطأ بوجهك) |
+| `settings.ini` | All settings + position + last test result |
+| `usage.ini` | Usage counters |
+| `error.log` | Only written if something goes wrong (the app never shows you error dialogs) |
 
-لتصفير كل شي: سكّر البرنامج واحذف المجلد.
-
----
-
-## ملاحظات تقنية
-
-**ما بيأثر على أي تطبيق تاني** — أربع طبقات:
-- `WS_EX_NOACTIVATE` — ما بياخد التركيز أبداً؛ لو كنت عم تكتب وضغطت عليه بالغلط، الكتابة بتضل رايحة عالبرنامج الأصلي
-- `WS_EX_TOOLWINDOW` + `ShowInTaskbar=false` — مش ظاهر بشريط المهام ولا بـ Alt+Tab
-- خيار تمرير النقر
-- الإخفاء التلقائي عند ملء الشاشة، عبر `SHQueryUserNotificationState` — نفس الاستفسار يلي بيستعمله شريط المهام نفسه، فما بينخدع بنافذة مكبّرة عادية
-
-**نسخة وحدة بس** — عبر `Mutex`؛ تشغيله مرتين بيطلع بصمت بدل ما يفتح ودجت تاني.
-
-**دقة القياس** — القسمة بتصير على الوقت الفعلي المقيس بـ `Stopwatch` مش على 1000ms ثابتة، وإلا الأرقام بتطلع مضروبة لما يرجع الجهاز من السكون. وإذا نزلت قراءة العدّاد عن السابقة (بيصير لما يعيد الكرت التشغيل) بينحسب الفرق صفر مش رقم ضخم غلط.
-
-**الخفّة** — إعادة الرسم بتصير **بس لما يتغيّر النص المعروض**؛ إذا السرعة ثابتة ما في إعادة رسم أصلاً. والاستهلاك بينكتب عالقرص كل 60 ثانية وعند الخروج، مش كل ثانية.
+To reset everything: close the app and delete the folder.
 
 ---
 
-## مشكلة معروفة: البحث ما بيلاقي البرنامج
+## Technical notes
 
-بحث ويندوز بيفهرس **اختصارات قائمة ابدأ**، مش أي `exe` قاعد بأي مجلد. البرنامج بينشئ الاختصار لحاله أول تشغيل، وفي خيار يدوي بالقائمة تحت **السلوك**.
+**Never interferes with other apps** — four layers:
+- `WS_EX_NOACTIVATE` — never takes focus; if you're typing in another program and accidentally click it, your keystrokes keep going to that program
+- `WS_EX_TOOLWINDOW` + `ShowInTaskbar=false` — invisible in the taskbar and Alt+Tab
+- Click-through option
+- Automatic fullscreen hiding via `SHQueryUserNotificationState` — the same query the taskbar itself uses, so it isn't fooled by a plain maximized window
 
-**مصيدة مهمة:** واجهة `WScript.Shell` بترمي استثناء لما يكون مسار الملف فيه حروف غير لاتينية — متل مجلد سطح المكتب المربوط بـ OneDrive (`C:\Users\...\OneDrive\سطح المكتب`). لهيك خلّي النسخة الأساسية بمسار إنجليزي (متل `D:\New\net-speed-meter\`) وخلّي الاختصار يأشّر عليها. الكود بيجرب صيغة 8.3 المختصرة كخطة بديلة، وبالنهاية **بيتحقق** إن الاختصار بيأشّر على ملف موجود فعلاً، وإذا لأ بيمسحه بدل ما يترك اختصار مكسور.
+**Single instance only** — via a `Mutex`; launching it twice exits quietly instead of opening a second widget.
+
+**Measurement accuracy** — the division uses the actual elapsed time from a `Stopwatch`, not a fixed 1000ms, otherwise the numbers spike when the machine wakes from sleep. If the counter reading drops below the previous one (happens when the adapter resets), the delta is treated as zero instead of a huge bogus number.
+
+**Lightweight by design** — the widget only redraws **when the displayed text actually changes**; a steady speed means zero redraws. Usage is written to disk every 60 seconds and on exit, not every second.
+
+---
+
+## Known issue: Windows Search can't find the app
+
+Windows Search indexes **Start Menu shortcuts**, not any exe sitting in some folder. The app creates its own shortcut on first launch, and there's a manual option for it in the menu under **Behavior**.
+
+**A real trap:** the `WScript.Shell` interface throws an exception when the save path contains non-Latin characters — like a OneDrive-synced Desktop folder (`C:\Users\...\OneDrive\<localized name>`). That's why the canonical copy lives at an ASCII path (like `D:\New\net-speed-meter\`) and the shortcut points there. The code also tries the short 8.3 path as a fallback, and finally **verifies** the saved shortcut actually resolves to a real file — deleting it instead of leaving a broken shortcut behind if not.
