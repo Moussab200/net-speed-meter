@@ -11,6 +11,8 @@
 [![Dependencies](https://img.shields.io/badge/dependencies-zero-success)](#)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
+### [⬇️ تحميل آخر إصدار](https://github.com/Moussab200/net-speed-meter/releases/latest)
+
 </div>
 
 ---
