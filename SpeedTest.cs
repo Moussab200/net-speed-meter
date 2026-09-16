@@ -50,9 +50,10 @@ namespace NetSpeedMeter
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterScreen;
             TopMost = true;
-            RightToLeft = RightToLeft.Yes;
-            RightToLeftLayout = true;
-            Text = "اختبار سرعة الإنترنت";
+            bool isAr = Cfg.Language == Lang.Arabic;
+            RightToLeft = isAr ? RightToLeft.Yes : RightToLeft.No;
+            RightToLeftLayout = isAr;
+            Text = Tr.Get(TrId.SpeedTestTitle);
             ClientSize = new Size(P(360), P(268));
 
             Color bg = Opaque(bgBase);
@@ -63,23 +64,23 @@ namespace NetSpeedMeter
             BackColor = bg;
             ForeColor = fg;
 
-            lblTitle = Mk("اختبار سرعة الإنترنت", 12f, FontStyle.Bold, fg, P(18), P(16), P(324), P(28));
-            lblTitle.TextAlign = ContentAlignment.MiddleRight;
+            lblTitle = Mk(Tr.Get(TrId.SpeedTestTitle), 12f, FontStyle.Bold, fg, P(18), P(16), P(324), P(28));
+            lblTitle.TextAlign = isAr ? ContentAlignment.MiddleRight : ContentAlignment.MiddleLeft;
 
             int y = P(58);
-            lblPingK = Mk("زمن الاستجابة", 9.5f, FontStyle.Regular, dim, P(18), y, P(150), P(26));
+            lblPingK = Mk(Tr.Get(TrId.SpeedTestPing), 9.5f, FontStyle.Regular, dim, P(18), y, P(150), P(26));
             lblPingV = Mk("—", 15f, FontStyle.Bold, fg, P(170), y - P(4), P(172), P(32));
-            lblPingV.TextAlign = ContentAlignment.MiddleLeft;
+            lblPingV.TextAlign = isAr ? ContentAlignment.MiddleLeft : ContentAlignment.MiddleRight;
 
             y += P(44);
-            lblDownK = Mk("التنزيل  ↓", 9.5f, FontStyle.Regular, dim, P(18), y, P(150), P(26));
+            lblDownK = Mk(Tr.Get(TrId.SpeedTestDown), 9.5f, FontStyle.Regular, dim, P(18), y, P(150), P(26));
             lblDownV = Mk("—", 15f, FontStyle.Bold, Color.FromArgb(Cfg.ColDown), P(170), y - P(4), P(172), P(32));
-            lblDownV.TextAlign = ContentAlignment.MiddleLeft;
+            lblDownV.TextAlign = isAr ? ContentAlignment.MiddleLeft : ContentAlignment.MiddleRight;
 
             y += P(44);
-            lblUpK = Mk("الرفع  ↑", 9.5f, FontStyle.Regular, dim, P(18), y, P(150), P(26));
+            lblUpK = Mk(Tr.Get(TrId.SpeedTestUp), 9.5f, FontStyle.Regular, dim, P(18), y, P(150), P(26));
             lblUpV = Mk("—", 15f, FontStyle.Bold, Color.FromArgb(Cfg.ColUp), P(170), y - P(4), P(172), P(32));
-            lblUpV.TextAlign = ContentAlignment.MiddleLeft;
+            lblUpV.TextAlign = isAr ? ContentAlignment.MiddleLeft : ContentAlignment.MiddleRight;
 
             y += P(48);
             bar = new Panel();
@@ -94,13 +95,13 @@ namespace NetSpeedMeter
             barFill.BackColor = Color.FromArgb(Cfg.ColDown);
             bar.Controls.Add(barFill);
 
-            lblStatus = Mk("جاهز للاختبار", 9f, FontStyle.Regular, dim, P(18), y + P(12), P(324), P(24));
-            lblStatus.TextAlign = ContentAlignment.MiddleRight;
+            lblStatus = Mk(Tr.Get(TrId.SpeedTestReady), 9f, FontStyle.Regular, dim, P(18), y + P(12), P(324), P(24));
+            lblStatus.TextAlign = isAr ? ContentAlignment.MiddleRight : ContentAlignment.MiddleLeft;
 
-            btnRun = MkBtn("ابدأ الاختبار", P(198), P(222), P(144), P(32));
+            btnRun = MkBtn(Tr.Get(TrId.SpeedTestStart), P(198), P(222), P(144), P(32));
             btnRun.Click += delegate { Start(); };
 
-            btnClose = MkBtn("إغلاق", P(18), P(222), P(100), P(32));
+            btnClose = MkBtn(Tr.Get(TrId.SpeedTestClose), P(18), P(222), P(100), P(32));
             btnClose.Click += delegate { Close(); };
 
             // إذا في نتيجة سابقة محفوظة، بنعرضها لحد ما يبلّش اختبار جديد
@@ -109,7 +110,7 @@ namespace NetSpeedMeter
                 lblPingV.Text = Cfg.LastPing > 0 ? Cfg.LastPing + " ms" : "—";
                 lblDownV.Text = Fmt(Cfg.LastDown);
                 lblUpV.Text = Fmt(Cfg.LastUp);
-                lblStatus.Text = "آخر اختبار: " + Cfg.LastTest;
+                lblStatus.Text = Tr.Get(TrId.SpeedTestLastPrefix) + Cfg.LastTest;
             }
         }
 
@@ -137,7 +138,7 @@ namespace NetSpeedMeter
             l.BackColor = Color.Transparent;
             l.Location = new Point(x, y);
             l.Size = new Size(w, h);
-            l.TextAlign = ContentAlignment.MiddleRight;
+            l.TextAlign = Cfg.Language == Lang.Arabic ? ContentAlignment.MiddleRight : ContentAlignment.MiddleLeft;
             Controls.Add(l);
             return l;
         }
@@ -213,16 +214,16 @@ namespace NetSpeedMeter
             double down = 0, up = 0;
 
             // ---------- 1. زمن الاستجابة ----------
-            Status("قياس زمن الاستجابة…");
+            Status(Tr.Get(TrId.SpeedTestMeasuringPing));
             Progress(4);
             ping = MeasurePing();
             long pingShow = ping;
-            UI(delegate { if (!IsDisposed) lblPingV.Text = pingShow > 0 ? pingShow + " ms" : "تعذّر"; });
+            UI(delegate { if (!IsDisposed) lblPingV.Text = pingShow > 0 ? pingShow + " ms" : Tr.Get(TrId.SpeedTestPingFailed); });
 
             if (cancelAll) { Done(ping, 0, 0, true); return; }
 
             // ---------- 2. التنزيل ----------
-            Status("قياس سرعة التنزيل…");
+            Status(Tr.Get(TrId.SpeedTestMeasuringDown));
             down = Measure(true);
             double dShow = down;
             UI(delegate { if (!IsDisposed) lblDownV.Text = Fmt(dShow); });
@@ -230,7 +231,7 @@ namespace NetSpeedMeter
             if (cancelAll) { Done(ping, down, 0, true); return; }
 
             // ---------- 3. الرفع ----------
-            Status("قياس سرعة الرفع…");
+            Status(Tr.Get(TrId.SpeedTestMeasuringUp));
             up = Measure(false);
             double uShow = up;
             UI(delegate { if (!IsDisposed) lblUpV.Text = Fmt(uShow); });
@@ -252,9 +253,9 @@ namespace NetSpeedMeter
             }
 
             string msg;
-            if (aborted) msg = "انلغى الاختبار";
-            else if (!ok) msg = lastError.Length > 0 ? lastError : "تعذّر الاتصال بخادم القياس";
-            else msg = "خلص الاختبار";
+            if (aborted) msg = Tr.Get(TrId.SpeedTestAborted);
+            else if (!ok) msg = lastError.Length > 0 ? lastError : Tr.Get(TrId.SpeedTestFailed);
+            else msg = Tr.Get(TrId.SpeedTestCompleted);
             Status(msg);
             UI(delegate { if (!IsDisposed) btnRun.Enabled = true; });
         }
@@ -415,12 +416,12 @@ namespace NetSpeedMeter
             {
                 switch (we.Status)
                 {
-                    case WebExceptionStatus.Timeout: return "انتهت مهلة الاتصال";
-                    case WebExceptionStatus.NameResolutionFailure: return "تعذّر الوصول للخادم - تحقق من الإنترنت";
-                    case WebExceptionStatus.ConnectFailure: return "تعذّر الاتصال - ممكن يكون جدار الحماية مانع البرنامج";
-                    case WebExceptionStatus.SecureChannelFailure: return "مشكلة بالاتصال الآمن (TLS)";
-                    case WebExceptionStatus.TrustFailure: return "مشكلة بشهادة الأمان";
-                    default: return "تعذّر الاتصال (" + we.Status + ")";
+                    case WebExceptionStatus.Timeout: return Tr.Get(TrId.SpeedTestErrTimeout);
+                    case WebExceptionStatus.NameResolutionFailure: return Tr.Get(TrId.SpeedTestErrResolution);
+                    case WebExceptionStatus.ConnectFailure: return Tr.Get(TrId.SpeedTestErrConnect);
+                    case WebExceptionStatus.SecureChannelFailure: return Tr.Get(TrId.SpeedTestErrTls);
+                    case WebExceptionStatus.TrustFailure: return Tr.Get(TrId.SpeedTestErrCert);
+                    default: return Tr.Get(TrId.SpeedTestErrGeneral) + " (" + we.Status + ")";
                 }
             }
             return ex.Message;

@@ -163,6 +163,204 @@ namespace NetSpeedMeter
     }
 
     // ============================================================
+    // اللغات والنصوص
+    // ============================================================
+    public enum Lang
+    {
+        English,
+        Arabic
+    }
+
+    public enum TrId
+    {
+        TrayToday,
+        MenuPlace,
+        MenuLock,
+        MenuSnap,
+        MenuCornerTR,
+        MenuCornerTL,
+        MenuCornerBR,
+        MenuCornerBL,
+        MenuMoveToScreen,
+        MenuScreen,
+        MenuPrimary,
+        MenuAppearance,
+        MenuTopMost,
+        MenuOpacity,
+        MenuFontSize,
+        MenuFontSmall,
+        MenuFontMedium,
+        MenuFontLarge,
+        MenuOrientation,
+        MenuVertical,
+        MenuHorizontal,
+        MenuMatchTbHeight,
+        MenuMatchTbColor,
+        MenuColors,
+        ColorDefault,
+        ColorNeon,
+        ColorSunset,
+        ColorMonochrome,
+        ColorFrost,
+        ColorPickUp,
+        ColorPickDown,
+        ColorPickText,
+        ColorPickBg,
+        ColorReset,
+        MenuMeasure,
+        MenuFormat,
+        FormatAuto,
+        FormatFixedKB,
+        FormatFixedMB,
+        FormatFixedGB,
+        MenuUnit,
+        UnitBytes,
+        UnitBits,
+        MenuAdapter,
+        AdapterAuto,
+        AdapterDisconnected,
+        MenuSpeedTest,
+        MenuLastTest,
+        MenuUsage,
+        UsageToday,
+        UsageMonth,
+        UsageTotal,
+        UsageReset,
+        MenuBehavior,
+        MenuClickThrough,
+        MenuHideFullscreen,
+        MenuStartWithWindows,
+        MenuStartShortcut,
+        MenuResetDefaults,
+        MenuLanguage,
+        LangEnglish,
+        LangArabic,
+        MenuExit,
+        SpeedTestTitle,
+        SpeedTestPing,
+        SpeedTestDown,
+        SpeedTestUp,
+        SpeedTestReady,
+        SpeedTestStart,
+        SpeedTestClose,
+        SpeedTestLastPrefix,
+        SpeedTestMeasuringPing,
+        SpeedTestMeasuringDown,
+        SpeedTestMeasuringUp,
+        SpeedTestPingFailed,
+        SpeedTestAborted,
+        SpeedTestFailed,
+        SpeedTestCompleted,
+        SpeedTestErrTimeout,
+        SpeedTestErrResolution,
+        SpeedTestErrConnect,
+        SpeedTestErrTls,
+        SpeedTestErrCert,
+        SpeedTestErrGeneral
+    }
+
+    public static class Tr
+    {
+        public static string Get(TrId id)
+        {
+            return Get(id, Cfg.Language);
+        }
+
+        public static string Get(TrId id, Lang lang)
+        {
+            bool ar = lang == Lang.Arabic;
+            switch (id)
+            {
+                case TrId.TrayToday: return ar ? "اليوم: " : "Today: ";
+                case TrId.MenuPlace: return ar ? "المكان" : "Position";
+                case TrId.MenuLock: return ar ? "اقفل المكان" : "Lock Position";
+                case TrId.MenuSnap: return ar ? "الالتصاق بحواف الشاشة" : "Snap to Screen Edges";
+                case TrId.MenuCornerTR: return ar ? "أعلى اليمين" : "Top Right";
+                case TrId.MenuCornerTL: return ar ? "أعلى اليسار" : "Top Left";
+                case TrId.MenuCornerBR: return ar ? "أسفل اليمين" : "Bottom Right";
+                case TrId.MenuCornerBL: return ar ? "أسفل اليسار" : "Bottom Left";
+                case TrId.MenuMoveToScreen: return ar ? "انقله لشاشة" : "Move to Screen";
+                case TrId.MenuScreen: return ar ? "شاشة " : "Screen ";
+                case TrId.MenuPrimary: return ar ? " (الرئيسية)" : " (Primary)";
+                case TrId.MenuAppearance: return ar ? "المظهر" : "Appearance";
+                case TrId.MenuTopMost: return ar ? "دائماً بالمقدمة" : "Always on Top";
+                case TrId.MenuOpacity: return ar ? "الشفافية" : "Opacity";
+                case TrId.MenuFontSize: return ar ? "حجم الخط" : "Font Size";
+                case TrId.MenuFontSmall: return ar ? "صغير" : "Small";
+                case TrId.MenuFontMedium: return ar ? "متوسط" : "Medium";
+                case TrId.MenuFontLarge: return ar ? "كبير" : "Large";
+                case TrId.MenuOrientation: return ar ? "الاتجاه" : "Orientation";
+                case TrId.MenuVertical: return ar ? "عمودي" : "Vertical";
+                case TrId.MenuHorizontal: return ar ? "أفقي" : "Horizontal";
+                case TrId.MenuMatchTbHeight: return ar ? "بنفس ارتفاع شريط المهام" : "Match Taskbar Height";
+                case TrId.MenuMatchTbColor: return ar ? "بنفس لون شريط المهام" : "Match Taskbar Color";
+                case TrId.MenuColors: return ar ? "الألوان" : "Colors";
+                case TrId.ColorDefault: return ar ? "الافتراضي" : "Default";
+                case TrId.ColorNeon: return ar ? "نيون" : "Neon";
+                case TrId.ColorSunset: return ar ? "غروب" : "Sunset";
+                case TrId.ColorMonochrome: return ar ? "أبيض وأسود" : "Monochrome";
+                case TrId.ColorFrost: return ar ? "ثلجي" : "Frost";
+                case TrId.ColorPickUp: return ar ? "لون سهم الرفع…" : "Upload Arrow Color…";
+                case TrId.ColorPickDown: return ar ? "لون سهم التنزيل…" : "Download Arrow Color…";
+                case TrId.ColorPickText: return ar ? "لون الأرقام…" : "Text Color…";
+                case TrId.ColorPickBg: return ar ? "لون الخلفية…" : "Background Color…";
+                case TrId.ColorReset: return ar ? "استرجاع الألوان الافتراضية" : "Reset Default Colors";
+                case TrId.MenuMeasure: return ar ? "القياس" : "Measurement";
+                case TrId.MenuFormat: return ar ? "الصيغة" : "Format";
+                case TrId.FormatAuto: return ar ? "تلقائي (بيبدّل لحاله)" : "Auto (dynamic)";
+                case TrId.FormatFixedKB: return ar ? "كيلو ثابت" : "Fixed KB";
+                case TrId.FormatFixedMB: return ar ? "ميجا ثابت" : "Fixed MB";
+                case TrId.FormatFixedGB: return ar ? "جيجا ثابت" : "Fixed GB";
+                case TrId.MenuUnit: return ar ? "الوحدة" : "Unit";
+                case TrId.UnitBytes: return ar ? "بايت  ‏(MBps)" : "Bytes (MBps)";
+                case TrId.UnitBits: return ar ? "بِت  ‏(Mbps)" : "Bits (Mbps)";
+                case TrId.MenuAdapter: return ar ? "كرت الشبكة" : "Network Adapter";
+                case TrId.AdapterAuto: return ar ? "تلقائي" : "Auto";
+                case TrId.AdapterDisconnected: return ar ? "  (مفصول)" : "  (Disconnected)";
+                case TrId.MenuSpeedTest: return ar ? "اختبار سرعة الإنترنت…" : "Speed Test…";
+                case TrId.MenuLastTest: return ar ? "      آخر اختبار:  " : "      Last test:  ";
+                case TrId.MenuUsage: return ar ? "الاستهلاك" : "Data Usage";
+                case TrId.UsageToday: return ar ? "اليوم:        ↓ " : "Today:        ↓ ";
+                case TrId.UsageMonth: return ar ? "هذا الشهر:  ↓ " : "This Month:   ↓ ";
+                case TrId.UsageTotal: return ar ? "الإجمالي:     ↓ " : "Total:        ↓ ";
+                case TrId.UsageReset: return ar ? "تصفير العدّادات" : "Reset Counters";
+                case TrId.MenuBehavior: return ar ? "السلوك" : "Behavior";
+                case TrId.MenuClickThrough: return ar ? "تمرير النقر (النقرة بتعدّي من خلاله)" : "Click-through (transparent to clicks)";
+                case TrId.MenuHideFullscreen: return ar ? "إخفاء عند ملء الشاشة" : "Hide in Fullscreen";
+                case TrId.MenuStartWithWindows: return ar ? "يبدأ مع ويندوز" : "Start with Windows";
+                case TrId.MenuStartShortcut: return ar ? "أنشئ اختصار في قائمة ابدأ (حتى يلاقيه بحث ويندوز)" : "Create Start Menu shortcut (for Windows search)";
+                case TrId.MenuResetDefaults: return ar ? "استرجاع الإعدادات الافتراضية" : "Reset All Settings";
+                case TrId.MenuLanguage: return ar ? "اللغة" : "Language";
+                case TrId.LangEnglish: return "English";
+                case TrId.LangArabic: return "عربي";
+                case TrId.MenuExit: return ar ? "خروج" : "Exit";
+                case TrId.SpeedTestTitle: return ar ? "اختبار سرعة الإنترنت" : "Internet Speed Test";
+                case TrId.SpeedTestPing: return ar ? "زمن الاستجابة" : "Latency";
+                case TrId.SpeedTestDown: return ar ? "التنزيل  ↓" : "Download  ↓";
+                case TrId.SpeedTestUp: return ar ? "الرفع  ↑" : "Upload  ↑";
+                case TrId.SpeedTestReady: return ar ? "جاهز للاختبار" : "Ready to test";
+                case TrId.SpeedTestStart: return ar ? "ابدأ الاختبار" : "Start Test";
+                case TrId.SpeedTestClose: return ar ? "إغلاق" : "Close";
+                case TrId.SpeedTestLastPrefix: return ar ? "آخر اختبار: " : "Last test: ";
+                case TrId.SpeedTestMeasuringPing: return ar ? "قياس زمن الاستجابة…" : "Measuring latency…";
+                case TrId.SpeedTestMeasuringDown: return ar ? "قياس سرعة التنزيل…" : "Measuring download speed…";
+                case TrId.SpeedTestMeasuringUp: return ar ? "قياس سرعة الرفع…" : "Measuring upload speed…";
+                case TrId.SpeedTestPingFailed: return ar ? "تعذّر" : "Failed";
+                case TrId.SpeedTestAborted: return ar ? "انلغى الاختبار" : "Test cancelled";
+                case TrId.SpeedTestFailed: return ar ? "تعذّر الاتصال بخادم القياس" : "Could not connect to speed test server";
+                case TrId.SpeedTestCompleted: return ar ? "خلص الاختبار" : "Test completed";
+                case TrId.SpeedTestErrTimeout: return ar ? "انتهت مهلة الاتصال" : "Connection timed out";
+                case TrId.SpeedTestErrResolution: return ar ? "تعذّر الوصول للخادم - تحقق من الإنترنت" : "Could not reach server - check your internet connection";
+                case TrId.SpeedTestErrConnect: return ar ? "تعذّر الاتصال - ممكن يكون جدار الحماية مانع البرنامج" : "Connection failed - firewall may be blocking the app";
+                case TrId.SpeedTestErrTls: return ar ? "مشكلة بالاتصال الآمن (TLS)" : "Secure connection error (TLS)";
+                case TrId.SpeedTestErrCert: return ar ? "مشكلة بشهادة الأمان" : "Security certificate error";
+                case TrId.SpeedTestErrGeneral: return ar ? "تعذّر الاتصال" : "Connection failed";
+                default: return "";
+            }
+        }
+    }
+
+    // ============================================================
     // ملف الإعدادات
     // ============================================================
     static class Cfg
@@ -198,6 +396,8 @@ namespace NetSpeedMeter
         // يطابق ارتفاع الودجت لارتفاع شريط المهام، وياخد لون الشريط الحقيقي بالعيّنة
         public static bool MatchTaskbar = true;
         public static bool UseTaskbarColor = true;
+
+        public static Lang Language = Lang.English;
 
         // آخر نتيجة اختبار سرعة - تنعرض بالقائمة لحد ما ينعاد الاختبار
         public static int LastPing;
@@ -245,6 +445,7 @@ namespace NetSpeedMeter
                         case "shortcut":  ShortcutDone = v == "1"; break;
                         case "matchTb":   MatchTaskbar = v == "1"; break;
                         case "tbColor":   UseTaskbarColor = v == "1"; break;
+                        case "language":  Language = v == "ar" ? Lang.Arabic : Lang.English; break;
                     }
                 }
             }
@@ -281,6 +482,7 @@ namespace NetSpeedMeter
                 sb.AppendLine("shortcut=" + B(ShortcutDone));
                 sb.AppendLine("matchTb=" + B(MatchTaskbar));
                 sb.AppendLine("tbColor=" + B(UseTaskbarColor));
+                sb.AppendLine("language=" + (Language == Lang.Arabic ? "ar" : "en"));
                 Io.WriteAtomic(SettingsPath, sb.ToString());
             }
             catch { }
@@ -321,6 +523,7 @@ namespace NetSpeedMeter
             ColUp = DefUp; ColDown = DefDown; ColText = DefText; ColBg = DefBg;
             ClickThrough = false; HideFullscreen = false;
             MatchTaskbar = true; UseTaskbarColor = true;
+            Language = Lang.English;
         }
     }
 
@@ -1266,7 +1469,7 @@ namespace NetSpeedMeter
             if (changed && tray != null)
             {
                 string tip = "↓ " + dnNum + " " + dnUnit + "   ↑ " + upNum + " " + upUnit
-                           + "\n" + "اليوم: " + FmtBytes(Usage.DayRx + Usage.DayTx);
+                           + "\n" + Tr.Get(TrId.TrayToday) + FmtBytes(Usage.DayRx + Usage.DayTx);
                 if (tip.Length > 62) tip = tip.Substring(0, 62);   // ويندوز بيرفض أطول من 63
                 if (tip != trayTip) { trayTip = tip; try { tray.Text = tip; } catch { } }
             }
@@ -1575,6 +1778,8 @@ namespace NetSpeedMeter
         {
             Cfg.ResetDefaults();
             Cfg.Save();
+            trayTip = "";
+            upNum = ""; dnNum = "";
 
             TopMost = Cfg.TopMost;
             ApplyClickThrough();
@@ -1628,6 +1833,7 @@ namespace NetSpeedMeter
 
         static void StyleMenu(ToolStripDropDown dd)
         {
+            dd.RightToLeft = Cfg.Language == Lang.Arabic ? RightToLeft.Yes : RightToLeft.No;
             dd.BackColor = Color.FromArgb(30, 30, 34);
             dd.ForeColor = Color.FromArgb(232, 232, 235);
             dd.Font = new Font("Segoe UI", 9.25f);
@@ -1642,34 +1848,47 @@ namespace NetSpeedMeter
             }
         }
 
+        void SetLanguage(Lang lang)
+        {
+            if (Cfg.Language == lang) return;
+            Cfg.Language = lang;
+            Cfg.Save();
+            trayTip = "";
+            upNum = ""; dnNum = "";
+            BeginInvoke((MethodInvoker)delegate
+            {
+                ShowMenuAt(Cursor.Position);
+            });
+        }
+
         ContextMenuStrip BuildMenu()
         {
             ContextMenuStrip m = new ContextMenuStrip();
-            m.RightToLeft = RightToLeft.Yes;
+            m.RightToLeft = Cfg.Language == Lang.Arabic ? RightToLeft.Yes : RightToLeft.No;
             m.ShowImageMargin = false;
             m.ShowCheckMargin = true;   // بدونها ما بتبيّن علامة الصح للخيارات المفعّلة
 
             // ---------- المكان ----------
-            ToolStripMenuItem place = new ToolStripMenuItem("المكان");
-            place.DropDownItems.Add(MIC("اقفل المكان", Cfg.Locked,
+            ToolStripMenuItem place = new ToolStripMenuItem(Tr.Get(TrId.MenuPlace));
+            place.DropDownItems.Add(MIC(Tr.Get(TrId.MenuLock), Cfg.Locked,
                 delegate { Cfg.Locked = !Cfg.Locked; Cfg.Save(); }));
-            place.DropDownItems.Add(MIC("الالتصاق بحواف الشاشة", Cfg.Snap,
+            place.DropDownItems.Add(MIC(Tr.Get(TrId.MenuSnap), Cfg.Snap,
                 delegate { Cfg.Snap = !Cfg.Snap; Cfg.Save(); }));
             place.DropDownItems.Add(new ToolStripSeparator());
-            place.DropDownItems.Add(MI("أعلى اليمين",  delegate { MoveToCorner(1); }));
-            place.DropDownItems.Add(MI("أعلى اليسار",  delegate { MoveToCorner(0); }));
-            place.DropDownItems.Add(MI("أسفل اليمين",  delegate { MoveToCorner(2); }));
-            place.DropDownItems.Add(MI("أسفل اليسار",  delegate { MoveToCorner(3); }));
+            place.DropDownItems.Add(MI(Tr.Get(TrId.MenuCornerTR),  delegate { MoveToCorner(1); }));
+            place.DropDownItems.Add(MI(Tr.Get(TrId.MenuCornerTL),  delegate { MoveToCorner(0); }));
+            place.DropDownItems.Add(MI(Tr.Get(TrId.MenuCornerBR),  delegate { MoveToCorner(2); }));
+            place.DropDownItems.Add(MI(Tr.Get(TrId.MenuCornerBL),  delegate { MoveToCorner(3); }));
 
             if (Screen.AllScreens.Length > 1)
             {
                 place.DropDownItems.Add(new ToolStripSeparator());
-                ToolStripMenuItem mon = new ToolStripMenuItem("انقله لشاشة");
+                ToolStripMenuItem mon = new ToolStripMenuItem(Tr.Get(TrId.MenuMoveToScreen));
                 Screen[] all = Screen.AllScreens;
                 for (int i = 0; i < all.Length; i++)
                 {
                     Screen sc = all[i];
-                    string label = "شاشة " + (i + 1) + (sc.Primary ? " (الرئيسية)" : "");
+                    string label = Tr.Get(TrId.MenuScreen) + (i + 1) + (sc.Primary ? Tr.Get(TrId.MenuPrimary) : "");
                     mon.DropDownItems.Add(MI(label, delegate { MoveToCorner(2, sc); }));
                 }
                 place.DropDownItems.Add(mon);
@@ -1677,12 +1896,12 @@ namespace NetSpeedMeter
             m.Items.Add(place);
 
             // ---------- المظهر ----------
-            ToolStripMenuItem look = new ToolStripMenuItem("المظهر");
-            look.DropDownItems.Add(MIC("دائماً بالمقدمة", Cfg.TopMost,
+            ToolStripMenuItem look = new ToolStripMenuItem(Tr.Get(TrId.MenuAppearance));
+            look.DropDownItems.Add(MIC(Tr.Get(TrId.MenuTopMost), Cfg.TopMost,
                 delegate { Cfg.TopMost = !Cfg.TopMost; TopMost = Cfg.TopMost; Cfg.Save(); }));
             look.DropDownItems.Add(new ToolStripSeparator());
 
-            ToolStripMenuItem op = new ToolStripMenuItem("الشفافية");
+            ToolStripMenuItem op = new ToolStripMenuItem(Tr.Get(TrId.MenuOpacity));
             int[] ops = { 50, 70, 85, 100 };
             foreach (int o in ops)
             {
@@ -1692,27 +1911,27 @@ namespace NetSpeedMeter
             }
             look.DropDownItems.Add(op);
 
-            ToolStripMenuItem fs = new ToolStripMenuItem("حجم الخط");
-            string[] fnames = { "صغير", "متوسط", "كبير" };
+            ToolStripMenuItem fs = new ToolStripMenuItem(Tr.Get(TrId.MenuFontSize));
+            TrId[] fids = { TrId.MenuFontSmall, TrId.MenuFontMedium, TrId.MenuFontLarge };
             for (int i = 0; i < 3; i++)
             {
                 int ii = i;
-                fs.DropDownItems.Add(MIC(fnames[i], Cfg.FontIdx == i,
+                fs.DropDownItems.Add(MIC(Tr.Get(fids[i]), Cfg.FontIdx == i,
                     delegate { Cfg.FontIdx = ii; Cfg.Save(); Relayout(); }));
             }
             look.DropDownItems.Add(fs);
 
-            ToolStripMenuItem ori = new ToolStripMenuItem("الاتجاه");
-            ori.DropDownItems.Add(MIC("عمودي", Cfg.Vertical,
+            ToolStripMenuItem ori = new ToolStripMenuItem(Tr.Get(TrId.MenuOrientation));
+            ori.DropDownItems.Add(MIC(Tr.Get(TrId.MenuVertical), Cfg.Vertical,
                 delegate { Cfg.Vertical = true; Cfg.Save(); Relayout(); }));
-            ori.DropDownItems.Add(MIC("أفقي", !Cfg.Vertical,
+            ori.DropDownItems.Add(MIC(Tr.Get(TrId.MenuHorizontal), !Cfg.Vertical,
                 delegate { Cfg.Vertical = false; Cfg.Save(); Relayout(); }));
             look.DropDownItems.Add(ori);
 
             look.DropDownItems.Add(new ToolStripSeparator());
-            look.DropDownItems.Add(MIC("بنفس ارتفاع شريط المهام", Cfg.MatchTaskbar,
+            look.DropDownItems.Add(MIC(Tr.Get(TrId.MenuMatchTbHeight), Cfg.MatchTaskbar,
                 delegate { Cfg.MatchTaskbar = !Cfg.MatchTaskbar; Cfg.Save(); Relayout(); }));
-            look.DropDownItems.Add(MIC("بنفس لون شريط المهام", Cfg.UseTaskbarColor,
+            look.DropDownItems.Add(MIC(Tr.Get(TrId.MenuMatchTbColor), Cfg.UseTaskbarColor,
                 delegate
                 {
                     Cfg.UseTaskbarColor = !Cfg.UseTaskbarColor;
@@ -1727,21 +1946,21 @@ namespace NetSpeedMeter
             m.Items.Add(look);
 
             // ---------- القياس ----------
-            ToolStripMenuItem meas = new ToolStripMenuItem("القياس");
-            ToolStripMenuItem fmt = new ToolStripMenuItem("الصيغة");
-            string[] fmts = { "تلقائي (بيبدّل لحاله)", "كيلو ثابت", "ميجا ثابت", "جيجا ثابت" };
+            ToolStripMenuItem meas = new ToolStripMenuItem(Tr.Get(TrId.MenuMeasure));
+            ToolStripMenuItem fmt = new ToolStripMenuItem(Tr.Get(TrId.MenuFormat));
+            TrId[] fmtIds = { TrId.FormatAuto, TrId.FormatFixedKB, TrId.FormatFixedMB, TrId.FormatFixedGB };
             for (int i = 0; i < 4; i++)
             {
                 int ii = i;
-                fmt.DropDownItems.Add(MIC(fmts[i], Cfg.UnitMode == i,
+                fmt.DropDownItems.Add(MIC(Tr.Get(fmtIds[i]), Cfg.UnitMode == i,
                     delegate { Cfg.UnitMode = ii; Cfg.Save(); Relayout(); }));
             }
             meas.DropDownItems.Add(fmt);
 
-            ToolStripMenuItem un = new ToolStripMenuItem("الوحدة");
-            un.DropDownItems.Add(MIC("بايت  ‏(MBps)", !Cfg.Bits,
+            ToolStripMenuItem un = new ToolStripMenuItem(Tr.Get(TrId.MenuUnit));
+            un.DropDownItems.Add(MIC(Tr.Get(TrId.UnitBytes), !Cfg.Bits,
                 delegate { Cfg.Bits = false; Cfg.Save(); Relayout(); }));
-            un.DropDownItems.Add(MIC("بِت  ‏(Mbps)", Cfg.Bits,
+            un.DropDownItems.Add(MIC(Tr.Get(TrId.UnitBits), Cfg.Bits,
                 delegate { Cfg.Bits = true; Cfg.Save(); Relayout(); }));
             meas.DropDownItems.Add(un);
 
@@ -1750,38 +1969,46 @@ namespace NetSpeedMeter
             m.Items.Add(meas);
 
             // ---------- اختبار السرعة ----------
-            m.Items.Add(MI("اختبار سرعة الإنترنت…", delegate { OpenSpeedTest(); }));
+            m.Items.Add(MI(Tr.Get(TrId.MenuSpeedTest), delegate { OpenSpeedTest(); }));
             if (Cfg.LastTest.Length > 0)
-                m.Items.Add(Info("      آخر اختبار:  ↓ " + FmtMbps(Cfg.LastDown)
+                m.Items.Add(Info(Tr.Get(TrId.MenuLastTest) + "↓ " + FmtMbps(Cfg.LastDown)
                                  + "   ↑ " + FmtMbps(Cfg.LastUp) + "   (" + Cfg.LastTest + ")"));
 
             // ---------- الاستهلاك ----------
             Usage.Roll();
-            ToolStripMenuItem us = new ToolStripMenuItem("الاستهلاك");
-            us.DropDownItems.Add(Info("اليوم:        ↓ " + FmtBytes(Usage.DayRx) + "   ↑ " + FmtBytes(Usage.DayTx)));
-            us.DropDownItems.Add(Info("هذا الشهر:  ↓ " + FmtBytes(Usage.MonRx) + "   ↑ " + FmtBytes(Usage.MonTx)));
-            us.DropDownItems.Add(Info("الإجمالي:     ↓ " + FmtBytes(Usage.TotRx) + "   ↑ " + FmtBytes(Usage.TotTx)));
+            ToolStripMenuItem us = new ToolStripMenuItem(Tr.Get(TrId.MenuUsage));
+            us.DropDownItems.Add(Info(Tr.Get(TrId.UsageToday) + FmtBytes(Usage.DayRx) + "   ↑ " + FmtBytes(Usage.DayTx)));
+            us.DropDownItems.Add(Info(Tr.Get(TrId.UsageMonth) + FmtBytes(Usage.MonRx) + "   ↑ " + FmtBytes(Usage.MonTx)));
+            us.DropDownItems.Add(Info(Tr.Get(TrId.UsageTotal) + FmtBytes(Usage.TotRx) + "   ↑ " + FmtBytes(Usage.TotTx)));
             us.DropDownItems.Add(new ToolStripSeparator());
-            us.DropDownItems.Add(MI("تصفير العدّادات", delegate { Usage.Reset(); }));
+            us.DropDownItems.Add(MI(Tr.Get(TrId.UsageReset), delegate { Usage.Reset(); }));
             m.Items.Add(us);
 
             // ---------- السلوك ----------
-            ToolStripMenuItem beh = new ToolStripMenuItem("السلوك");
-            beh.DropDownItems.Add(MIC("تمرير النقر (النقرة بتعدّي من خلاله)", Cfg.ClickThrough,
+            ToolStripMenuItem beh = new ToolStripMenuItem(Tr.Get(TrId.MenuBehavior));
+            beh.DropDownItems.Add(MIC(Tr.Get(TrId.MenuClickThrough), Cfg.ClickThrough,
                 delegate { Cfg.ClickThrough = !Cfg.ClickThrough; Cfg.Save(); ApplyClickThrough(); }));
-            beh.DropDownItems.Add(MIC("إخفاء عند ملء الشاشة", Cfg.HideFullscreen,
+            beh.DropDownItems.Add(MIC(Tr.Get(TrId.MenuHideFullscreen), Cfg.HideFullscreen,
                 delegate { Cfg.HideFullscreen = !Cfg.HideFullscreen; Cfg.Save(); }));
-            beh.DropDownItems.Add(MIC("يبدأ مع ويندوز", StartupOn(),
+            beh.DropDownItems.Add(MIC(Tr.Get(TrId.MenuStartWithWindows), StartupOn(),
                 delegate { SetStartup(!StartupOn()); }));
             beh.DropDownItems.Add(new ToolStripSeparator());
-            beh.DropDownItems.Add(MI("أنشئ اختصار في قائمة ابدأ (حتى يلاقيه بحث ويندوز)",
+            beh.DropDownItems.Add(MI(Tr.Get(TrId.MenuStartShortcut),
                 delegate { Program.EnsureStartMenuShortcut(); }));
             beh.DropDownItems.Add(new ToolStripSeparator());
-            beh.DropDownItems.Add(MI("استرجاع الإعدادات الافتراضية", delegate { ResetAll(); }));
+            beh.DropDownItems.Add(MI(Tr.Get(TrId.MenuResetDefaults), delegate { ResetAll(); }));
             m.Items.Add(beh);
 
+            // ---------- اللغة ----------
+            ToolStripMenuItem langMenu = new ToolStripMenuItem(Tr.Get(TrId.MenuLanguage));
+            langMenu.DropDownItems.Add(MIC(Tr.Get(TrId.LangEnglish), Cfg.Language == Lang.English,
+                delegate { SetLanguage(Lang.English); }));
+            langMenu.DropDownItems.Add(MIC(Tr.Get(TrId.LangArabic), Cfg.Language == Lang.Arabic,
+                delegate { SetLanguage(Lang.Arabic); }));
+            m.Items.Add(langMenu);
+
             m.Items.Add(new ToolStripSeparator());
-            m.Items.Add(MI("خروج", delegate { Quit(); }));
+            m.Items.Add(MI(Tr.Get(TrId.MenuExit), delegate { Quit(); }));
             return m;
         }
 
@@ -1811,15 +2038,15 @@ namespace NetSpeedMeter
 
         ToolStripMenuItem BuildColorsMenu()
         {
-            ToolStripMenuItem col = new ToolStripMenuItem("الألوان");
+            ToolStripMenuItem col = new ToolStripMenuItem(Tr.Get(TrId.MenuColors));
 
             // أطقم جاهزة: اسم، رفع، تنزيل، نص، خلفية
             object[][] presets = new object[][] {
-                new object[]{ "الافتراضي", Cfg.DefUp, Cfg.DefDown, Cfg.DefText, Cfg.DefBg },
-                new object[]{ "نيون",      unchecked((int)0xFF00E5FF), unchecked((int)0xFF39FF6A), unchecked((int)0xFFFFFFFF), unchecked((int)0xF00A0A12) },
-                new object[]{ "غروب",      unchecked((int)0xFFFF8A3D), unchecked((int)0xFF4FC3F7), unchecked((int)0xFFFFF3E6), unchecked((int)0xEB2A1E22) },
-                new object[]{ "أبيض وأسود", unchecked((int)0xFFDDDDDD), unchecked((int)0xFF999999), unchecked((int)0xFFFFFFFF), unchecked((int)0xF0141414) },
-                new object[]{ "ثلجي",      unchecked((int)0xFF2563EB), unchecked((int)0xFF059669), unchecked((int)0xFF1A1A1A), unchecked((int)0xEBF2F4F8) }
+                new object[]{ TrId.ColorDefault,    Cfg.DefUp, Cfg.DefDown, Cfg.DefText, Cfg.DefBg },
+                new object[]{ TrId.ColorNeon,       unchecked((int)0xFF00E5FF), unchecked((int)0xFF39FF6A), unchecked((int)0xFFFFFFFF), unchecked((int)0xF00A0A12) },
+                new object[]{ TrId.ColorSunset,     unchecked((int)0xFFFF8A3D), unchecked((int)0xFF4FC3F7), unchecked((int)0xFFFFF3E6), unchecked((int)0xEB2A1E22) },
+                new object[]{ TrId.ColorMonochrome, unchecked((int)0xFFDDDDDD), unchecked((int)0xFF999999), unchecked((int)0xFFFFFFFF), unchecked((int)0xF0141414) },
+                new object[]{ TrId.ColorFrost,      unchecked((int)0xFF2563EB), unchecked((int)0xFF059669), unchecked((int)0xFF1A1A1A), unchecked((int)0xEBF2F4F8) }
             };
 
             foreach (object[] p in presets)
@@ -1827,7 +2054,7 @@ namespace NetSpeedMeter
                 object[] pp = p;
                 bool active = Cfg.ColUp == (int)pp[1] && Cfg.ColDown == (int)pp[2]
                            && Cfg.ColText == (int)pp[3] && Cfg.ColBg == (int)pp[4];
-                col.DropDownItems.Add(MIC((string)pp[0], active, delegate
+                col.DropDownItems.Add(MIC(Tr.Get((TrId)pp[0]), active, delegate
                 {
                     Cfg.ColUp = (int)pp[1]; Cfg.ColDown = (int)pp[2];
                     Cfg.ColText = (int)pp[3]; Cfg.ColBg = (int)pp[4];
@@ -1836,12 +2063,12 @@ namespace NetSpeedMeter
             }
 
             col.DropDownItems.Add(new ToolStripSeparator());
-            col.DropDownItems.Add(MI("لون سهم الرفع…",   delegate { PickColor(0); }));
-            col.DropDownItems.Add(MI("لون سهم التنزيل…", delegate { PickColor(1); }));
-            col.DropDownItems.Add(MI("لون الأرقام…",     delegate { PickColor(2); }));
-            col.DropDownItems.Add(MI("لون الخلفية…",     delegate { PickColor(3); }));
+            col.DropDownItems.Add(MI(Tr.Get(TrId.ColorPickUp),   delegate { PickColor(0); }));
+            col.DropDownItems.Add(MI(Tr.Get(TrId.ColorPickDown), delegate { PickColor(1); }));
+            col.DropDownItems.Add(MI(Tr.Get(TrId.ColorPickText), delegate { PickColor(2); }));
+            col.DropDownItems.Add(MI(Tr.Get(TrId.ColorPickBg),   delegate { PickColor(3); }));
             col.DropDownItems.Add(new ToolStripSeparator());
-            col.DropDownItems.Add(MI("استرجاع الألوان الافتراضية", delegate
+            col.DropDownItems.Add(MI(Tr.Get(TrId.ColorReset), delegate
             {
                 Cfg.ColUp = Cfg.DefUp; Cfg.ColDown = Cfg.DefDown;
                 Cfg.ColText = Cfg.DefText; Cfg.ColBg = Cfg.DefBg;
@@ -1878,9 +2105,9 @@ namespace NetSpeedMeter
 
         ToolStripMenuItem BuildAdaptersMenu()
         {
-            ToolStripMenuItem ad = new ToolStripMenuItem("كرت الشبكة");
+            ToolStripMenuItem ad = new ToolStripMenuItem(Tr.Get(TrId.MenuAdapter));
             string activeName = nic != null ? nic.Name : "—";
-            ad.DropDownItems.Add(MIC("تلقائي  (" + activeName + ")", Cfg.Adapter.Length == 0,
+            ad.DropDownItems.Add(MIC(Tr.Get(TrId.AdapterAuto) + "  (" + activeName + ")", Cfg.Adapter.Length == 0,
                 delegate { Cfg.Adapter = ""; Cfg.Save(); nic = null; nicAge = 99; haveLast = false; }));
             ad.DropDownItems.Add(new ToolStripSeparator());
             try
@@ -1890,7 +2117,7 @@ namespace NetSpeedMeter
                     if (ni.NetworkInterfaceType == NetworkInterfaceType.Loopback) continue;
                     if (ni.NetworkInterfaceType == NetworkInterfaceType.Tunnel) continue;
                     string id = ni.Id;
-                    string label = ni.Name + (ni.OperationalStatus == OperationalStatus.Up ? "" : "  (مفصول)");
+                    string label = ni.Name + (ni.OperationalStatus == OperationalStatus.Up ? "" : Tr.Get(TrId.AdapterDisconnected));
                     ad.DropDownItems.Add(MIC(label, Cfg.Adapter == id, delegate
                     {
                         Cfg.Adapter = id; Cfg.Save();
