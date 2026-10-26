@@ -74,6 +74,8 @@ powershell -ExecutionPolicy Bypass -File deploy.ps1
 
 Builds, signs, installs into the protected folder, and updates every shortcut.
 
+**Signing key handling:** the self-signed certificate's private key never stays on the machine. It lives in a password-protected file (`Documents\NetSpeedMeter-signing.pfx`), is imported only for the moment of signing, and is deleted from the certificate store right after — so malware running on the PC can't borrow it to sign itself as "trusted". Only the public part of the certificate stays in the trusted store. Keep a backup of the `.pfx` and its password; without them you'd need a new certificate. (First run after upgrading moves an existing key off the machine into that file automatically.)
+
 ### Why there's no auto-update
 
 Deliberate. Auto-update sounds like a security feature, but it's the opposite — it's a ready-made channel for pushing code onto your machine later. The app is safer and lighter without one.
