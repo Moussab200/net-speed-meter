@@ -1,4 +1,5 @@
 *.exe
+*.pfx
 *.obj
 *.pdb
 icon-preview*.png

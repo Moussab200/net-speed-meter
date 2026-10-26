@@ -14,6 +14,9 @@ $InstallDir = 'C:\Program Files\Net Speed Meter'
 $InstallExe = Join-Path $InstallDir 'NetSpeedMeter.exe'
 $CertSubject = 'CN=Net Speed Meter (Personal)'
 $HashRef    = Join-Path $env:APPDATA 'NetSpeedMeter\release.sha256'
+# المفتاح السري للتوقيع بيعيش بهالملف المحمي بكلمة سر، مش بمخزن شهادات الجهاز.
+# بينحط بالمخزن بس وقت التوقيع وبينشال بعده، حتى أي برنامج خبيث ما يقدر يوقّع حاله باسمنا.
+$PfxPath    = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'NetSpeedMeter-signing.pfx'
 
 function Say($m, $c = 'Gray') { Write-Host $m -ForegroundColor $c }
 
@@ -53,33 +56,81 @@ Pop-Location
 if ($LASTEXITCODE -ne 0) { Say "[!] فشل البناء" Red; return }
 Say "      تم - $([math]::Round((Get-Item $SrcExe).Length/1KB,1)) KB" Green
 
-# --- 2) شهادة التوقيع (بتنعمل مرة وحدة وبتضل) ---
+# --- 2) شهادة التوقيع ---
+# المفتاح السري ما بيضل على الجهاز: بينحفظ بملف PFX محمي بكلمة سر، بينحط بالمخزن
+# وقت التوقيع بس، وبعدها بينمسح. الجزء العام من الشهادة بس بيضل بالجهات الموثوقة.
 Say "[2/6] تجهيز شهادة التوقيع..." Cyan
-$cert = Get-ChildItem Cert:\CurrentUser\My |
-        Where-Object { $_.Subject -eq $CertSubject -and $_.NotAfter -gt (Get-Date) } |
-        Select-Object -First 1
 
-if (-not $cert) {
+function Read-NewPfxPassword {
+    while ($true) {
+        $a = Read-Host "      اختار كلمة سر لملف التوقيع" -AsSecureString
+        $b = Read-Host "      أعد كتابتها للتأكيد" -AsSecureString
+        $pa = [Runtime.InteropServices.Marshal]::PtrToStringBSTR([Runtime.InteropServices.Marshal]::SecureStringToBSTR($a))
+        $pb = [Runtime.InteropServices.Marshal]::PtrToStringBSTR([Runtime.InteropServices.Marshal]::SecureStringToBSTR($b))
+        if ($pa.Length -lt 8)  { Say "      [!] لازم 8 حروف على الأقل" Yellow; continue }
+        if ($pa -ne $pb)       { Say "      [!] الكلمتين مش متطابقتين، جرّب مرة تانية" Yellow; continue }
+        return $a
+    }
+}
+
+function Add-PublicCertToRoot($c) {
+    # الجزء العام بس (بدون المفتاح) حتى ويندوز يعتبر التوقيع Valid مش UnknownError
+    $pub = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2(,$c.RawData)
+    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store('Root','CurrentUser')
+    $store.Open('ReadWrite')
+    if (-not ($store.Certificates | Where-Object { $_.Thumbprint -eq $pub.Thumbprint })) { $store.Add($pub) }
+    $store.Close()
+}
+
+# شهادة قديمة مفتاحها لسا قاعد بالمخزن (من النسخ السابقة من هالسكربت)
+$legacy = Get-ChildItem Cert:\CurrentUser\My |
+          Where-Object { $_.Subject -eq $CertSubject -and $_.HasPrivateKey -and $_.NotAfter -gt (Get-Date) } |
+          Select-Object -First 1
+
+if (Test-Path -LiteralPath $PfxPath) {
+    $pw = Read-Host "      كلمة سر ملف التوقيع" -AsSecureString
+    try {
+        $cert = Import-PfxCertificate -FilePath $PfxPath -CertStoreLocation Cert:\CurrentUser\My -Password $pw
+    } catch {
+        Say "[!] كلمة السر غلط أو الملف خربان - النشر انلغى" Red
+        Say "    إذا نسيت كلمة السر: احذف $PfxPath وشغّل السكربت من جديد (رح تنعمل شهادة جديدة)" Yellow
+        return
+    }
+    Say "      الشهادة انفتحت من الملف المحمي" Green
+} elseif ($legacy) {
+    Say "      لقيت المفتاح السري قاعد بالجهاز - رح ننقله لملف محمي بكلمة سر" Yellow
+    $pw = Read-NewPfxPassword
+    Export-PfxCertificate -Cert $legacy -FilePath $PfxPath -Password $pw | Out-Null
+    $cert = $legacy
+    Say "      انحفظ بـ $PfxPath" Green
+} else {
     $cert = New-SelfSignedCertificate -Subject $CertSubject `
         -Type CodeSigningCert -CertStoreLocation Cert:\CurrentUser\My `
         -KeyUsage DigitalSignature -KeyLength 2048 `
         -NotAfter (Get-Date).AddYears(10)
-    # نضيفها للجهات الموثوقة حتى ويندوز يعتبر التوقيع Valid مش UnknownError
-    $store = New-Object System.Security.Cryptography.X509Certificates.X509Store('Root','CurrentUser')
-    $store.Open('ReadWrite'); $store.Add($cert); $store.Close()
-    Say "      انعملت شهادة جديدة (صالحة 10 سنين)" Green
-} else {
-    Say "      الشهادة موجودة أصلاً" Green
+    $pw = Read-NewPfxPassword
+    Export-PfxCertificate -Cert $cert -FilePath $PfxPath -Password $pw | Out-Null
+    Say "      انعملت شهادة جديدة (صالحة 10 سنين) وانحفظت بـ $PfxPath" Green
 }
+Add-PublicCertToRoot $cert
+Say "      [!] احفظ نسخة من $PfxPath وكلمة سره بمكان آمن - بدونهم ما فيك توقّع نسخ جديدة بنفس الشهادة" DarkGray
 
 # --- 3) توقيع الملف ---
 Say "[3/6] توقيع الملف..." Cyan
-$sig = Set-AuthenticodeSignature -FilePath $SrcExe -Certificate $cert `
-        -HashAlgorithm SHA256 -TimestampServer 'http://timestamp.digicert.com' `
-        -ErrorAction SilentlyContinue
-if (-not $sig -or $sig.Status -ne 'Valid') {
-    # لو ما في إنترنت للطابع الزمني، منوقّع بدونه
-    $sig = Set-AuthenticodeSignature -FilePath $SrcExe -Certificate $cert -HashAlgorithm SHA256
+try {
+    $sig = Set-AuthenticodeSignature -FilePath $SrcExe -Certificate $cert `
+            -HashAlgorithm SHA256 -TimestampServer 'http://timestamp.digicert.com' `
+            -ErrorAction SilentlyContinue
+    if (-not $sig -or $sig.Status -ne 'Valid') {
+        # لو ما في إنترنت للطابع الزمني، منوقّع بدونه
+        $sig = Set-AuthenticodeSignature -FilePath $SrcExe -Certificate $cert -HashAlgorithm SHA256
+    }
+} finally {
+    # نشيل المفتاح السري من الجهاز بكل الأحوال، حتى لو التوقيع فشل
+    Get-ChildItem Cert:\CurrentUser\My |
+        Where-Object { $_.Subject -eq $CertSubject -and $_.HasPrivateKey } |
+        ForEach-Object { Remove-Item -LiteralPath $_.PSPath -DeleteKey }
+    Say "      المفتاح السري انشال من الجهاز" Green
 }
 # ملاحظة: أول ما تنضاف الشهادة لمخزن الجهات الموثوقة، العملية الحالية بتضل
 # ماسكة نتيجة فحص الثقة القديمة بالذاكرة، فبتقرا UnknownError رغم إن التوقيع
