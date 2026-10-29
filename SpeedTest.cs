@@ -15,8 +15,8 @@ namespace NetSpeedMeter
 {
     public class SpeedTestForm : Form
     {
-        // نقاط القياس - قابلة للتغيير من settings.ini إذا لزم
-        const string DownUrl = "https://speed.cloudflare.com/__down?bytes=100000000";
+        // 25MB لكل طلب لأن كلاودفلير صار يرجع 403 على الـ 100MB، واللوب بيكرر الطلب فالسرعة ما بتأثر
+        const string DownUrl = "https://speed.cloudflare.com/__down?bytes=25000000";
         const string UpUrl   = "https://speed.cloudflare.com/__up";
         const string PingHost = "1.1.1.1";
 
@@ -33,10 +33,83 @@ namespace NetSpeedMeter
         Button btnRun, btnClose;
 
         Thread worker;
-        volatile bool stop, cancelAll;
-        long totalBytes;
-        int liveRunning;
+        volatile bool cancelAll;
+        volatile PhaseState currentPhase;
         volatile string lastError = "";   // آخر سبب فشل فعلي - حتى نعرضه بدل ما نسكت
+
+        // حالة مرحلة قياس مستقلة (تنزيل أو رفع) لمنع تداخل الخيوط المتأخرة
+        sealed class PhaseState
+        {
+            public volatile bool Stop;
+            long totalBytes;
+            int liveRunning;
+            readonly object reqLock = new object();
+            readonly System.Collections.Generic.List<HttpWebRequest> activeReqs =
+                new System.Collections.Generic.List<HttpWebRequest>();
+
+            public PhaseState(int threadCount)
+            {
+                Interlocked.Exchange(ref liveRunning, threadCount);
+                Interlocked.Exchange(ref totalBytes, 0);
+            }
+
+            public long ReadBytes()
+            {
+                return Interlocked.Read(ref totalBytes);
+            }
+
+            public void AddBytes(long bytes)
+            {
+                Interlocked.Add(ref totalBytes, bytes);
+            }
+
+            public int ReadLive()
+            {
+                return Thread.VolatileRead(ref liveRunning);
+            }
+
+            public void DecrementLive()
+            {
+                Interlocked.Decrement(ref liveRunning);
+            }
+
+            public bool RegisterReq(HttpWebRequest req)
+            {
+                lock (reqLock)
+                {
+                    if (Stop)
+                    {
+                        try { req.Abort(); } catch { }
+                        return false;
+                    }
+                    activeReqs.Add(req);
+                    return true;
+                }
+            }
+
+            public void UnregisterReq(HttpWebRequest req)
+            {
+                lock (reqLock)
+                {
+                    activeReqs.Remove(req);
+                }
+            }
+
+            public void AbortAll()
+            {
+                Stop = true;
+                HttpWebRequest[] arr;
+                lock (reqLock)
+                {
+                    arr = activeReqs.ToArray();
+                    activeReqs.Clear();
+                }
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    try { arr[i].Abort(); } catch { }
+                }
+            }
+        }
 
         // bgOverride: اللون الفعلي المعروض بالودجت (ممكن يكون مأخوذ من شريط المهام)
         // حتى نافذة الاختبار تطلع بنفس الهوية مش بلون مختلف
@@ -164,6 +237,7 @@ namespace NetSpeedMeter
         void Start()
         {
             if (worker != null && worker.IsAlive) return;
+            cancelAll = false;
             btnRun.Enabled = false;
             lblPingV.Text = "—"; lblDownV.Text = "—"; lblUpV.Text = "—";
             barFill.Width = 0;
@@ -202,41 +276,54 @@ namespace NetSpeedMeter
         void Run()
         {
             lastError = "";
-            try
-            {
-                ServicePointManager.SecurityProtocol = (SecurityProtocolType)3072; // TLS 1.2
-                ServicePointManager.DefaultConnectionLimit = 32;
-                ServicePointManager.Expect100Continue = false;
-            }
-            catch { }
-
             long ping = -1;
             double down = 0, up = 0;
+            bool doneCalled = false;
 
-            // ---------- 1. زمن الاستجابة ----------
-            Status(Tr.Get(TrId.SpeedTestMeasuringPing));
-            Progress(4);
-            ping = MeasurePing();
-            long pingShow = ping;
-            UI(delegate { if (!IsDisposed) lblPingV.Text = pingShow > 0 ? pingShow + " ms" : Tr.Get(TrId.SpeedTestPingFailed); });
+            try
+            {
+                try
+                {
+                    ServicePointManager.SecurityProtocol |= (SecurityProtocolType)3072; // TLS 1.2
+                    ServicePointManager.DefaultConnectionLimit = 32;
+                    ServicePointManager.Expect100Continue = false;
+                }
+                catch { }
 
-            if (cancelAll) { Done(ping, 0, 0, true); return; }
+                // ---------- 1. زمن الاستجابة ----------
+                Status(Tr.Get(TrId.SpeedTestMeasuringPing));
+                Progress(4);
+                ping = MeasurePing();
+                long pingShow = ping;
+                UI(delegate { if (!IsDisposed) lblPingV.Text = pingShow >= 0 ? pingShow + " ms" : Tr.Get(TrId.SpeedTestPingFailed); });
 
-            // ---------- 2. التنزيل ----------
-            Status(Tr.Get(TrId.SpeedTestMeasuringDown));
-            down = Measure(true);
-            double dShow = down;
-            UI(delegate { if (!IsDisposed) lblDownV.Text = Fmt(dShow); });
+                if (cancelAll) { doneCalled = true; Done(ping, 0, 0, true); return; }
 
-            if (cancelAll) { Done(ping, down, 0, true); return; }
+                // ---------- 2. التنزيل ----------
+                Status(Tr.Get(TrId.SpeedTestMeasuringDown));
+                down = Measure(true);
+                double dShow = down;
+                UI(delegate { if (!IsDisposed) lblDownV.Text = Fmt(dShow); });
 
-            // ---------- 3. الرفع ----------
-            Status(Tr.Get(TrId.SpeedTestMeasuringUp));
-            up = Measure(false);
-            double uShow = up;
-            UI(delegate { if (!IsDisposed) lblUpV.Text = Fmt(uShow); });
+                if (cancelAll) { doneCalled = true; Done(ping, down, 0, true); return; }
 
-            Done(ping, down, up, false);
+                // ---------- 3. الرفع ----------
+                Status(Tr.Get(TrId.SpeedTestMeasuringUp));
+                up = Measure(false);
+                double uShow = up;
+                UI(delegate { if (!IsDisposed) lblUpV.Text = Fmt(uShow); });
+
+                doneCalled = true;
+                Done(ping, down, up, false);
+            }
+            catch (Exception ex)
+            {
+                lastError = DescribeError(ex);
+            }
+            finally
+            {
+                if (!doneCalled) Done(ping, down, up, cancelAll);
+            }
         }
 
         void Done(long ping, double down, double up, bool aborted)
@@ -245,9 +332,9 @@ namespace NetSpeedMeter
             bool ok = down > 0 || up > 0;
             if (!aborted && ok)
             {
-                Cfg.LastPing = (int)(ping > 0 ? ping : 0);
-                Cfg.LastDown = down;
-                Cfg.LastUp = up;
+                if (ping >= 0) Cfg.LastPing = (int)ping;
+                if (down > 0) Cfg.LastDown = down;
+                if (up > 0) Cfg.LastUp = up;
                 Cfg.LastTest = DateTime.Now.ToString("yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture);
                 Cfg.Save();
             }
@@ -255,6 +342,7 @@ namespace NetSpeedMeter
             string msg;
             if (aborted) msg = Tr.Get(TrId.SpeedTestAborted);
             else if (!ok) msg = lastError.Length > 0 ? lastError : Tr.Get(TrId.SpeedTestFailed);
+            else if ((down <= 0 || up <= 0) && lastError.Length > 0) msg = lastError;
             else msg = Tr.Get(TrId.SpeedTestCompleted);
             Status(msg);
             UI(delegate { if (!IsDisposed) btnRun.Enabled = true; });
@@ -267,15 +355,29 @@ namespace NetSpeedMeter
             {
                 using (Ping p = new Ping())
                 {
+                    int consecutiveFails = 0;
                     for (int i = 0; i < 4 && !cancelAll; i++)
                     {
                         try
                         {
-                            PingReply r = p.Send(PingHost, 2000);
+                            // مهلة 1 ثانية ونوقف بعد فشلين متتاليين حتى ما نعلّق 8 ثواني لو ICMP محجوب
+                            PingReply r = p.Send(PingHost, 1000);
                             if (r != null && r.Status == IPStatus.Success)
+                            {
+                                consecutiveFails = 0;
                                 if (best < 0 || r.RoundtripTime < best) best = r.RoundtripTime;
+                            }
+                            else
+                            {
+                                consecutiveFails++;
+                                if (consecutiveFails >= 2 && best < 0) break;
+                            }
                         }
-                        catch { }
+                        catch
+                        {
+                            consecutiveFails++;
+                            if (consecutiveFails >= 2 && best < 0) break;
+                        }
                     }
                 }
             }
@@ -286,15 +388,16 @@ namespace NetSpeedMeter
         // القياس الفعلي: نشغّل عدة اتصالات، ننتظر فترة إحماء، بعدين نقيس
         double Measure(bool download)
         {
-            totalBytes = 0;
-            stop = false;
             int n = download ? DownThreads : UpThreads;
-            liveRunning = n;
+            PhaseState phase = new PhaseState(n);
+            currentPhase = phase;
 
             Thread[] th = new Thread[n];
             for (int i = 0; i < n; i++)
             {
-                th[i] = new Thread(download ? new ThreadStart(DownWorker) : new ThreadStart(UpWorker));
+                th[i] = new Thread(download
+                    ? (ThreadStart)delegate { DownWorker(phase); }
+                    : (ThreadStart)delegate { UpWorker(phase); });
                 th[i].IsBackground = true;
                 th[i].Start();
             }
@@ -303,16 +406,16 @@ namespace NetSpeedMeter
             int waited = 0;
             while (waited < WarmupMs && !cancelAll) { Thread.Sleep(100); waited += 100; }
 
-            long baseBytes = Interlocked.Read(ref totalBytes);
+            long baseBytes = phase.ReadBytes();
             System.Diagnostics.Stopwatch sw = System.Diagnostics.Stopwatch.StartNew();
             double mbps = 0;
 
-            while (sw.ElapsedMilliseconds < MeasureMs && !cancelAll && liveRunning > 0)
+            while (sw.ElapsedMilliseconds < MeasureMs && !cancelAll && phase.ReadLive() > 0)
             {
                 Thread.Sleep(200);
                 double secs = sw.Elapsed.TotalSeconds;
                 if (secs <= 0) continue;
-                long b = Interlocked.Read(ref totalBytes) - baseBytes;
+                long b = phase.ReadBytes() - baseBytes;
                 mbps = b * 8.0 / 1000000.0 / secs;
 
                 double live = mbps;
@@ -326,8 +429,9 @@ namespace NetSpeedMeter
                 Progress(basePct + (int)(sw.ElapsedMilliseconds * 45.0 / MeasureMs));
             }
 
-            stop = true;
+            phase.AbortAll();
             for (int i = 0; i < n; i++) { try { th[i].Join(1500); } catch { } }
+            if (currentPhase == phase) currentPhase = null;
             return mbps;
         }
 
@@ -335,14 +439,15 @@ namespace NetSpeedMeter
         // مؤقتة، تدخّل جدار ناري، أي شي) كان يقتل الخيط كامل ونهائياً بلا إعادة
         // محاولة ولا أي رسالة - فيطلع التنزيل "0" فوراً وكأنه ما اشتغل إطلاقاً.
         // هلق كل طلب محاط بمحاولته الخاصة، وفشل واحد ما بيوقف الباقي.
-        void DownWorker()
+        void DownWorker(PhaseState phase)
         {
             byte[] buf = new byte[65536];
-            while (!stop && !cancelAll)
+            while (!phase.Stop && !cancelAll)
             {
+                HttpWebRequest req = null;
                 try
                 {
-                    HttpWebRequest req = (HttpWebRequest)WebRequest.Create(DownUrl);
+                    req = (HttpWebRequest)WebRequest.Create(DownUrl);
                     req.Method = "GET";
                     req.Timeout = 15000;
                     req.ReadWriteTimeout = 15000;
@@ -352,33 +457,43 @@ namespace NetSpeedMeter
                     req.CachePolicy = new System.Net.Cache.RequestCachePolicy(
                         System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
 
+                    if (!phase.RegisterReq(req)) break;
+
                     using (WebResponse res = req.GetResponse())
                     using (Stream st = res.GetResponseStream())
                     {
                         int r;
-                        while (!stop && !cancelAll && st != null && (r = st.Read(buf, 0, buf.Length)) > 0)
-                            Interlocked.Add(ref totalBytes, r);
+                        while (!phase.Stop && !cancelAll && st != null && (r = st.Read(buf, 0, buf.Length)) > 0)
+                            phase.AddBytes(r);
                     }
                 }
                 catch (Exception ex)
                 {
-                    lastError = DescribeError(ex);
-                    if (!stop && !cancelAll) Thread.Sleep(400);   // تهدئة قبل إعادة المحاولة
+                    if (!phase.Stop && !cancelAll)
+                    {
+                        lastError = DescribeError(ex);
+                        if (!phase.Stop && !cancelAll) Thread.Sleep(400);   // تهدئة قبل إعادة المحاولة
+                    }
+                }
+                finally
+                {
+                    if (req != null) phase.UnregisterReq(req);
                 }
             }
-            Interlocked.Decrement(ref liveRunning);
+            phase.DecrementLive();
         }
 
-        void UpWorker()
+        void UpWorker(PhaseState phase)
         {
             byte[] buf = new byte[65536];
             Random rnd = new Random();
             rnd.NextBytes(buf);   // بيانات عشوائية حتى ما ينضغط الرفع ويعطي رقم مغلوط
-            while (!stop && !cancelAll)
+            while (!phase.Stop && !cancelAll)
             {
+                HttpWebRequest req = null;
                 try
                 {
-                    HttpWebRequest req = (HttpWebRequest)WebRequest.Create(UpUrl);
+                    req = (HttpWebRequest)WebRequest.Create(UpUrl);
                     req.Method = "POST";
                     req.ContentType = "application/octet-stream";
                     req.AllowWriteStreamBuffering = false;
@@ -388,23 +503,41 @@ namespace NetSpeedMeter
                     req.KeepAlive = true;
                     req.UserAgent = "NetSpeedMeter/1.0";
 
+                    if (!phase.RegisterReq(req)) break;
+
                     using (Stream s = req.GetRequestStream())
                     {
-                        while (!stop && !cancelAll)
+                        while (!phase.Stop && !cancelAll)
                         {
                             s.Write(buf, 0, buf.Length);
-                            Interlocked.Add(ref totalBytes, buf.Length);
+                            phase.AddBytes(buf.Length);
                         }
                     }
-                    try { using (WebResponse r = req.GetResponse()) { } } catch { }
+
+                    // ما مننتظر الاستجابة لو توقف الاختبار
+                    if (!phase.Stop && !cancelAll)
+                    {
+                        try { using (WebResponse r = req.GetResponse()) { } } catch { }
+                    }
+                    else
+                    {
+                        try { req.Abort(); } catch { }
+                    }
                 }
                 catch (Exception ex)
                 {
-                    lastError = DescribeError(ex);
-                    if (!stop && !cancelAll) Thread.Sleep(400);
+                    if (!phase.Stop && !cancelAll)
+                    {
+                        lastError = DescribeError(ex);
+                        if (!phase.Stop && !cancelAll) Thread.Sleep(400);
+                    }
+                }
+                finally
+                {
+                    if (req != null) phase.UnregisterReq(req);
                 }
             }
-            Interlocked.Decrement(ref liveRunning);
+            phase.DecrementLive();
         }
 
         // بيرجّع سبب مفهوم بدل اسم صنف الاستثناء التقني - المستخدم مش لازم
@@ -421,6 +554,11 @@ namespace NetSpeedMeter
                     case WebExceptionStatus.ConnectFailure: return Tr.Get(TrId.SpeedTestErrConnect);
                     case WebExceptionStatus.SecureChannelFailure: return Tr.Get(TrId.SpeedTestErrTls);
                     case WebExceptionStatus.TrustFailure: return Tr.Get(TrId.SpeedTestErrCert);
+                    case WebExceptionStatus.ProtocolError:
+                        HttpWebResponse resp = we.Response as HttpWebResponse;
+                        if (resp != null)
+                            return Tr.Get(TrId.SpeedTestErrGeneral) + " (HTTP " + (int)resp.StatusCode + ")";
+                        return Tr.Get(TrId.SpeedTestErrGeneral) + " (" + we.Status + ")";
                     default: return Tr.Get(TrId.SpeedTestErrGeneral) + " (" + we.Status + ")";
                 }
             }
@@ -430,7 +568,8 @@ namespace NetSpeedMeter
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             cancelAll = true;
-            stop = true;
+            PhaseState ps = currentPhase;
+            if (ps != null) ps.AbortAll();
             base.OnFormClosing(e);
         }
     }
